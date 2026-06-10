@@ -1,0 +1,102 @@
+import type { AuthSession, CreateGroupRequest, GroupDto, JoinGroupRequest, MemberDto, SessionInfo } from '@gar/core';
+import { validateCreateGroup, validateJoinGroup } from '@gar/core';
+import type { Database } from '@gar/core/db';
+import type { Group, Member } from '@gar/core/schema';
+import { groups, members } from '@gar/core/schema';
+import { eq } from 'drizzle-orm';
+
+import { generateJoinCode } from '../auth/joinCode.js';
+import { generateDeviceToken, hashToken } from '../auth/tokens.js';
+import { AppError } from '../errors.js';
+
+const MAX_JOIN_CODE_ATTEMPTS = 5;
+
+function toGroupDto(group: Group): GroupDto {
+  return { id: group.id, name: group.name, joinCode: group.joinCode };
+}
+
+function toMemberDto(member: Member): MemberDto {
+  return {
+    id: member.id,
+    firstName: member.firstName,
+    lastName: member.lastName,
+    email: member.email,
+    role: member.role,
+  };
+}
+
+function isUniqueViolation(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code?: string }).code === '23505'
+  );
+}
+
+/** Creates a group and its admin member; returns the one-time device token. */
+export async function createGroup(db: Database, input: CreateGroupRequest): Promise<AuthSession> {
+  const validation = validateCreateGroup(input);
+  if (!validation.ok) throw new AppError(400, validation.errors.join(' '));
+
+  const deviceToken = generateDeviceToken();
+  const deviceTokenHash = hashToken(deviceToken);
+  const groupName = input.groupName.trim();
+  const firstName = input.firstName.trim();
+  const lastName = input.lastName.trim();
+  const email = input.email.trim().toLowerCase();
+
+  for (let attempt = 0; attempt < MAX_JOIN_CODE_ATTEMPTS; attempt += 1) {
+    const joinCode = generateJoinCode();
+    try {
+      const created = await db.transaction(async (tx) => {
+        const [group] = await tx.insert(groups).values({ name: groupName, joinCode }).returning();
+        const [member] = await tx
+          .insert(members)
+          .values({ groupId: group.id, firstName, lastName, email, role: 'admin', deviceTokenHash })
+          .returning();
+        return { group, member };
+      });
+      return { deviceToken, group: toGroupDto(created.group), member: toMemberDto(created.member) };
+    } catch (error) {
+      if (isUniqueViolation(error) && attempt < MAX_JOIN_CODE_ATTEMPTS - 1) continue;
+      throw error;
+    }
+  }
+  throw new AppError(500, 'Could not allocate a unique join code.');
+}
+
+/** Joins an existing group by code; re-joining with the same email rotates the device token. */
+export async function joinGroup(db: Database, input: JoinGroupRequest): Promise<AuthSession> {
+  const validation = validateJoinGroup(input);
+  if (!validation.ok) throw new AppError(400, validation.errors.join(' '));
+
+  const joinCode = input.joinCode.trim().toUpperCase();
+  const firstName = input.firstName.trim();
+  const lastName = input.lastName.trim();
+  const email = input.email.trim().toLowerCase();
+
+  const [group] = await db.select().from(groups).where(eq(groups.joinCode, joinCode)).limit(1);
+  if (!group) throw new AppError(404, 'No group found for that join code.');
+
+  const deviceToken = generateDeviceToken();
+  const deviceTokenHash = hashToken(deviceToken);
+
+  const [member] = await db
+    .insert(members)
+    .values({ groupId: group.id, firstName, lastName, email, role: 'member', deviceTokenHash })
+    .onConflictDoUpdate({
+      target: [members.groupId, members.email],
+      set: { firstName, lastName, deviceTokenHash },
+    })
+    .returning();
+
+  return { deviceToken, group: toGroupDto(group), member: toMemberDto(member) };
+}
+
+/** Resolves the current session (member + group) for an already-authenticated member. */
+export async function getSessionInfo(db: Database, member: Member): Promise<SessionInfo> {
+  const [group] = await db.select().from(groups).where(eq(groups.id, member.groupId)).limit(1);
+  if (!group) throw new AppError(404, 'Group not found.');
+  return { group: toGroupDto(group), member: toMemberDto(member) };
+}

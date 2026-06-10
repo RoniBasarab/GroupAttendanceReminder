@@ -1,7 +1,11 @@
 // Express REST API. On Vercel this whole app becomes a single Function via the
 // default export; locally it self-hosts with app.listen (guarded by !VERCEL).
+import './env.js';
+
 import express from 'express';
 
+import { errorHandler } from './errors.js';
+import { groupsRouter, meRouter } from './routes/groups.js';
 import { healthRouter } from './routes/health.js';
 
 export const app = express();
@@ -12,6 +16,10 @@ app.get('/', (_req, res) => {
   res.json({ service: 'gar-api', docs: '/api/health' });
 });
 app.use('/api/health', healthRouter);
+app.use('/api/groups', groupsRouter);
+app.use('/api/me', meRouter);
+
+app.use(errorHandler);
 
 export default app;
 

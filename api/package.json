@@ -6,13 +6,16 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
+    "test": "tsx src/services/membership.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@gar/core": "*",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.1",
     "@types/express": "^5.0.6"
   }
 }

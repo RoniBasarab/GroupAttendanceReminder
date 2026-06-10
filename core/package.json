@@ -2,9 +2,11 @@
   "name": "@gar/core",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./db": "./src/db/index.ts",
+    "./schema": "./src/db/schema.ts",
     "./forms": "./src/forms/index.ts"
   },
   "main": "src/index.ts",
