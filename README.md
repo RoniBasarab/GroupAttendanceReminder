@@ -33,6 +33,21 @@ npm run worker:tick    # run one dispatch immediately, then exit (for testing)
 npm run typecheck      # typecheck every workspace
 ```
 
+## Database (Drizzle + Supabase)
+
+Schema: `core/src/db/schema.ts`. Migrations are generated into `core/drizzle/`.
+
+```bash
+npm run db:generate    # schema -> SQL migration (offline, no DB needed)
+npm run db:migrate     # apply migrations (needs a real DATABASE_URL)
+npm run db:push        # push schema directly (dev convenience)
+npm run db:studio      # browse data
+```
+
+`db:generate` runs without a database. `db:migrate` / `db:push` / `db:studio` need a real
+Supabase `DATABASE_URL` (Shared Pooler, transaction mode) in `.env`. The Google Form configs
+are stored in the `form_configs` table — not in the repo.
+
 ## Running the worker on the always-on PC
 
 The worker only makes outbound calls (reads Supabase, sends push/email), so it needs **no
