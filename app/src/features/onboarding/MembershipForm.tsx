@@ -37,12 +37,12 @@ export function MembershipForm({ mode }: { mode: Mode }) {
       const input: CreateGroupRequest = { groupName: primary, firstName, lastName, email };
       const result = validateCreateGroup(input);
       if (!result.ok) return setLocalError(result.errors.join(' '));
-      mutation.mutate(input);
+      mutation.mutate(result.data);
     } else {
       const input: JoinGroupRequest = { joinCode: primary, firstName, lastName, email };
       const result = validateJoinGroup(input);
       if (!result.ok) return setLocalError(result.errors.join(' '));
-      mutation.mutate(input);
+      mutation.mutate(result.data);
     }
   }
 
