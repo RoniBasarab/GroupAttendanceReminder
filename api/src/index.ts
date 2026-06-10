@@ -1,3 +1,24 @@
-// Vercel + Express REST API (join, sync schedule, register token, confirm -> Google POST).
-// Implemented in Section 8.2 onward.
-export {};
+// Express REST API. On Vercel this whole app becomes a single Function via the
+// default export; locally it self-hosts with app.listen (guarded by !VERCEL).
+import express from 'express';
+
+import { healthRouter } from './routes/health.js';
+
+export const app = express();
+
+app.use(express.json());
+
+app.get('/', (_req, res) => {
+  res.json({ service: 'gar-api', docs: '/api/health' });
+});
+app.use('/api/health', healthRouter);
+
+export default app;
+
+// Local development only — Vercel sets VERCEL=1 and manages the listener itself.
+if (!process.env.VERCEL) {
+  const port = Number(process.env.PORT ?? 3001);
+  app.listen(port, () => {
+    console.log(`[api] listening on http://localhost:${port}`);
+  });
+}

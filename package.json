@@ -9,12 +9,17 @@
     "worker"
   ],
   "scripts": {
-    "app": "npm run start -w app",
+    "app": "npm run start -w @gar/app",
+    "dev:api": "npm run dev -w @gar/api",
+    "dev:worker": "npm run dev -w @gar/worker",
+    "worker:tick": "npm run tick -w @gar/worker",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "@types/node": "^25.9.2",
     "prettier": "^3.4.2",
+    "tsx": "^4.22.4",
     "typescript": "~6.0.3"
   }
 }
