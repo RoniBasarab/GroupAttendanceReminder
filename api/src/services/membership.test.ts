@@ -2,7 +2,7 @@
 // Applies the generated migration, then exercises create/join/getSession.
 import { PGlite } from '@electric-sql/pglite';
 import type { Database } from '@gar/core/db';
-import { members } from '@gar/core/schema';
+import { formConfigs, members } from '@gar/core/schema';
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/pglite';
 import { migrate } from 'drizzle-orm/pglite/migrator';
@@ -33,6 +33,15 @@ async function main() {
   assert.equal(admin.group.joinCode.length, 6);
   assert.ok(admin.deviceToken.length > 0);
   assert.equal(admin.member.email, 'sarah@example.com', 'email is normalized to lowercase');
+
+  // form configs are auto-seeded for the new group (morning + evening)
+  const seeded = await db.select().from(formConfigs).where(eq(formConfigs.groupId, admin.group.id));
+  assert.equal(seeded.length, 2, 'two form configs seeded on group creation');
+  assert.deepEqual(
+    seeded.map((row) => row.kind).sort(),
+    ['evening', 'morning'],
+    'both morning and evening configs seeded',
+  );
 
   // join with the code -> member
   const joiner = await joinGroup(db, {

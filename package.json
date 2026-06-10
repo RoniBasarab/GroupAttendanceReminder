@@ -17,6 +17,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
+    "forms:print": "node -e \"console.log(JSON.stringify(require('./core/forms.local.json')))\"",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "format": "prettier --write ."
   },

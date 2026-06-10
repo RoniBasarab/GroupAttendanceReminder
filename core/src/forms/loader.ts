@@ -1,6 +1,7 @@
-// Node-only loader for the real Google Form configs. The actual URLs and field IDs
-// live in core/forms.local.json, which is gitignored and never published.
-// Section 8.3 replaces this with a Supabase `form_configs` table seeded from that file.
+// Loads the real Google Form configs. The actual URLs/field IDs are never published:
+//  - production (Vercel): from the FORMS_CONFIG_JSON env var (the file isn't deployed)
+//  - local dev: from the gitignored core/forms.local.json
+// Section 8.x reads these once at group creation to seed the `form_configs` table.
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -11,13 +12,15 @@ const here = dirname(fileURLToPath(import.meta.url)); // core/src/forms
 const dataPath = resolve(here, '../../forms.local.json'); // core/forms.local.json
 
 export function loadForms(): Record<FormKind, FormConfig> {
-  let raw: string;
+  const fromEnv = process.env.FORMS_CONFIG_JSON;
+  if (fromEnv) {
+    return JSON.parse(fromEnv) as Record<FormKind, FormConfig>;
+  }
   try {
-    raw = readFileSync(dataPath, 'utf8');
+    return JSON.parse(readFileSync(dataPath, 'utf8')) as Record<FormKind, FormConfig>;
   } catch {
     throw new Error(
-      `Missing ${dataPath}. Copy core/forms.example.json to core/forms.local.json and fill in the real form configs.`,
+      'Form configs not found. Set FORMS_CONFIG_JSON, or create core/forms.local.json from core/forms.example.json.',
     );
   }
-  return JSON.parse(raw) as Record<FormKind, FormConfig>;
 }

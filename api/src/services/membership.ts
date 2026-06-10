@@ -1,8 +1,9 @@
 import type { AuthSession, GroupDto, MemberDto, SessionInfo } from '@gar/core';
 import { validateCreateGroup, validateJoinGroup } from '@gar/core';
 import type { Database } from '@gar/core/db';
+import { loadForms } from '@gar/core/forms';
 import type { Group, Member } from '@gar/core/schema';
-import { groups, members } from '@gar/core/schema';
+import { formConfigs, groups, members } from '@gar/core/schema';
 import { eq } from 'drizzle-orm';
 
 import { generateJoinCode } from '../auth/joinCode.js';
@@ -34,11 +35,18 @@ function isUniqueViolation(error: unknown): boolean {
   );
 }
 
-/** Creates a group and its admin member; returns the one-time device token. */
+/** Creates a group + admin member and seeds its form configs; returns the device token. */
 export async function createGroup(db: Database, input: unknown): Promise<AuthSession> {
   const parsed = validateCreateGroup(input);
   if (!parsed.ok) throw new AppError(400, parsed.errors.join(' '));
   const { groupName, firstName, lastName, email } = parsed.data;
+
+  let forms;
+  try {
+    forms = Object.values(loadForms());
+  } catch (error) {
+    throw new AppError(500, error instanceof Error ? error.message : 'Form config unavailable.');
+  }
 
   const deviceToken = generateDeviceToken();
   const deviceTokenHash = hashToken(deviceToken);
@@ -52,6 +60,17 @@ export async function createGroup(db: Database, input: unknown): Promise<AuthSes
           .insert(members)
           .values({ groupId: group.id, firstName, lastName, email, role: 'admin', deviceTokenHash })
           .returning();
+        await tx.insert(formConfigs).values(
+          forms.map((form) => ({
+            groupId: group.id,
+            kind: form.kind,
+            title: form.title,
+            formResponseUrl: form.formResponseUrl,
+            firstNameField: form.firstNameField,
+            lastNameField: form.lastNameField,
+            lessons: form.lessons,
+          })),
+        );
         return { group, member };
       });
       return { deviceToken, group: toGroupDto(created.group), member: toMemberDto(created.member) };
