@@ -47,3 +47,6 @@ architecture.md
 AGENTS.md
 CLAUDE.md
 .claude/
+
+# real Google Form configs (URLs + field IDs) — never publish; use forms.example.json
+core/forms.local.json

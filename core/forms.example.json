@@ -1,0 +1,21 @@
+{
+  "morning": {
+    "kind": "morning",
+    "title": "Morning attendance form title",
+    "formResponseUrl": "https://docs.google.com/forms/d/e/FORM_ID/formResponse",
+    "firstNameField": "entry.000000001",
+    "lastNameField": "entry.000000002",
+    "lessons": [
+      { "entryId": "entry.000000003", "label": "Lesson 1 HH:MM-HH:MM" },
+      { "entryId": "entry.000000004", "label": "Lesson 2 HH:MM-HH:MM" }
+    ]
+  },
+  "evening": {
+    "kind": "evening",
+    "title": "Evening attendance form title",
+    "formResponseUrl": "https://docs.google.com/forms/d/e/FORM_ID/formResponse",
+    "firstNameField": "entry.000000005",
+    "lastNameField": "entry.000000006",
+    "lessons": [{ "entryId": "entry.000000007", "label": "Lesson 1 HH:MM-HH:MM" }]
+  }
+}
