@@ -39,3 +39,10 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# agent / planning / local-only docs (never publish)
+planning.md
+architecture.md
+AGENTS.md
+CLAUDE.md
+.claude/
