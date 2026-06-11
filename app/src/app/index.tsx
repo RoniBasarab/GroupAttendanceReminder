@@ -2,11 +2,13 @@ import { Link, Redirect } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Pressable, Share, StyleSheet, Text, View } from 'react-native';
 
+import { useEnablePush } from '@/features/push/useEnablePush';
 import { useSessionStore } from '@/shared/state/useSessionStore';
 
 export default function Home() {
   const session = useSessionStore((state) => state.session);
   const clearSession = useSessionStore((state) => state.clearSession);
+  const enablePush = useEnablePush();
 
   if (!session) {
     return <Redirect href="/onboarding" />;
@@ -40,6 +42,24 @@ export default function Home() {
           <Text style={styles.buttonText}>Schedule</Text>
         </Pressable>
       </Link>
+
+      <Pressable
+        style={styles.button}
+        onPress={() => enablePush.mutate()}
+        disabled={enablePush.isPending}
+      >
+        <Text style={styles.buttonText}>
+          {enablePush.isPending
+            ? 'Enabling…'
+            : enablePush.data && enablePush.data !== 'unavailable'
+              ? 'Notifications on ✓'
+              : 'Enable notifications'}
+        </Text>
+      </Pressable>
+      {enablePush.data === 'unavailable' ? (
+        <Text style={styles.line}>Notifications aren’t available on this device yet.</Text>
+      ) : null}
+      {enablePush.error ? <Text style={styles.line}>{(enablePush.error as Error).message}</Text> : null}
 
       <Pressable style={styles.link} onPress={clearSession}>
         <Text style={styles.linkText}>Sign out</Text>
