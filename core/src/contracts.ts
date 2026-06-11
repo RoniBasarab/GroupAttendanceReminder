@@ -37,6 +37,9 @@ export type MemberDto = {
 export type AuthSession = { deviceToken: string; member: MemberDto; group: GroupDto };
 export type SessionInfo = { member: MemberDto; group: GroupDto };
 
+export const setRoleSchema = z.object({ role: z.enum(['admin', 'member']) });
+export type SetRoleRequest = z.infer<typeof setRoleSchema>;
+
 export const pushPlatformSchema = z.enum(['android', 'web']);
 export const registerTokenSchema = z.object({
   token: z.string().trim().min(1, 'Push token is required.'),

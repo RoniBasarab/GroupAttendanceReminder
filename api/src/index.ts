@@ -7,6 +7,7 @@ import express from 'express';
 import { errorHandler } from './errors.js';
 import { groupsRouter, meRouter } from './routes/groups.js';
 import { healthRouter } from './routes/health.js';
+import { membersRouter } from './routes/members.js';
 import { pushRouter } from './routes/push.js';
 import { scheduleRouter } from './routes/schedule.js';
 
@@ -20,6 +21,7 @@ app.get('/', (_req, res) => {
 app.use('/api/health', healthRouter);
 app.use('/api/groups', groupsRouter);
 app.use('/api/me', meRouter);
+app.use('/api/members', membersRouter);
 app.use('/api/schedule', scheduleRouter);
 app.use('/api/push', pushRouter);
 

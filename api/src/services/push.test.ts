@@ -52,7 +52,7 @@ async function main() {
   assert.equal(rows[0].token, 'tok-2');
 
   console.log('push token integration test: ALL PASSED');
-  await client.close();
+  process.exit(0);
 }
 
 main().catch((error) => {

@@ -108,7 +108,7 @@ async function main() {
   assert.equal(schedule.exceptions.length, 0);
 
   console.log('schedule integration test: ALL PASSED');
-  await client.close();
+  process.exit(0);
 }
 
 main().catch((error) => {

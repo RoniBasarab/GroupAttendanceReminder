@@ -88,7 +88,7 @@ async function main() {
   assert.equal(info.member.role, 'admin');
 
   console.log('membership integration test: ALL PASSED');
-  await client.close();
+  process.exit(0);
 }
 
 main().catch((error) => {
