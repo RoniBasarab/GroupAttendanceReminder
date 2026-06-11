@@ -2,6 +2,7 @@ import { Link, Redirect } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Pressable, Share, StyleSheet, Text, View } from 'react-native';
 
+import { useConfirmAttendance } from '@/features/attendance/useConfirmAttendance';
 import { useEnablePush } from '@/features/push/useEnablePush';
 import { useSessionStore } from '@/shared/state/useSessionStore';
 
@@ -9,6 +10,7 @@ export default function Home() {
   const session = useSessionStore((state) => state.session);
   const clearSession = useSessionStore((state) => state.clearSession);
   const enablePush = useEnablePush();
+  const confirm = useConfirmAttendance();
 
   if (!session) {
     return <Redirect href="/onboarding" />;
@@ -28,6 +30,23 @@ export default function Home() {
         <Text style={styles.codeLabel}>Join code</Text>
         <Text style={styles.code}>{group.joinCode}</Text>
       </View>
+
+      <Pressable
+        style={styles.confirmButton}
+        onPress={() => confirm.mutate()}
+        disabled={confirm.isPending}
+      >
+        <Text style={styles.confirmText}>
+          {confirm.isPending
+            ? 'Submitting…'
+            : confirm.data?.status === 'submitted'
+              ? 'Attendance submitted ✓'
+              : confirm.data?.status === 'already'
+                ? 'Already confirmed ✓'
+                : "Confirm today's attendance"}
+        </Text>
+      </Pressable>
+      {confirm.error ? <Text style={styles.line}>{(confirm.error as Error).message}</Text> : null}
 
       <Pressable
         style={styles.button}
@@ -88,6 +107,8 @@ const styles = StyleSheet.create({
   code: { fontSize: 32, fontWeight: '700', letterSpacing: 4 },
   button: { backgroundColor: '#2563eb', paddingVertical: 12, paddingHorizontal: 20, borderRadius: 10 },
   buttonText: { color: '#fff', fontWeight: '600' },
+  confirmButton: { backgroundColor: '#16a34a', paddingVertical: 16, paddingHorizontal: 24, borderRadius: 12 },
+  confirmText: { color: '#fff', fontWeight: '700', fontSize: 16 },
   link: { paddingVertical: 8 },
   linkText: { color: '#2563eb' },
 });
