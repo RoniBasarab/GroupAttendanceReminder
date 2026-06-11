@@ -5,6 +5,7 @@ import './env.js';
 import express from 'express';
 
 import { errorHandler } from './errors.js';
+import { attendanceRouter } from './routes/attendance.js';
 import { groupsRouter, meRouter } from './routes/groups.js';
 import { healthRouter } from './routes/health.js';
 import { internalRouter } from './routes/internal.js';
@@ -26,6 +27,7 @@ app.use('/api/members', membersRouter);
 app.use('/api/schedule', scheduleRouter);
 app.use('/api/push', pushRouter);
 app.use('/api/internal', internalRouter);
+app.use('/api/attendance', attendanceRouter);
 
 app.use(errorHandler);
 

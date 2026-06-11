@@ -83,9 +83,7 @@ export async function dispatchReminders(db: Database, deps: DispatchDeps): Promi
     let emailed = 0;
     for (const member of memberRows) {
       if (memberHasToken.has(member.id)) continue;
-      await deps.senders.sendEmail(
-        buildReminderEmail(member.email, member.firstName, group.name, formKind, date, deps.webUrl),
-      );
+      await deps.senders.sendEmail(buildReminderEmail(member, group.name, date, deps.webUrl));
       emailed += 1;
     }
 

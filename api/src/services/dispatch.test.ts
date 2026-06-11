@@ -19,6 +19,8 @@ import { setWeeklySchedule } from './schedule.js';
 const here = dirname(fileURLToPath(import.meta.url));
 const migrationsFolder = resolve(here, '../../../core/drizzle');
 
+process.env.CONFIRM_SECRET = 'test-confirm-secret'; // for the email link's signed token
+
 const pushCalls: { tokens: string[] }[] = [];
 const emailCalls: { to: string }[] = [];
 const badTokens = new Set<string>();

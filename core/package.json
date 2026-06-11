@@ -9,7 +9,9 @@
     "./schema": "./src/db/schema.ts",
     "./forms": "./src/forms/index.ts",
     "./notify": "./src/notify/index.ts",
-    "./dispatch": "./src/dispatch/index.ts"
+    "./dispatch": "./src/dispatch/index.ts",
+    "./submit": "./src/submit/index.ts",
+    "./auth": "./src/auth/index.ts"
   },
   "main": "src/index.ts",
   "types": "src/index.ts",

@@ -21,6 +21,7 @@ export const formKind = pgEnum('form_kind', ['morning', 'evening']);
 export const memberRole = pgEnum('member_role', ['admin', 'member']);
 export const pushPlatform = pgEnum('push_platform', ['android', 'web']);
 export const exceptionKind = pgEnum('exception_kind', ['extra', 'cancelled']);
+export const submissionStatus = pgEnum('submission_status', ['submitted', 'failed']);
 
 /** A class/group. The join code is shared with members; the admin is a member with role='admin'. */
 export const groups = pgTable('groups', {
@@ -129,6 +130,22 @@ export const reminderLog = pgTable(
   (t) => [uniqueIndex('reminder_group_date_idx').on(t.groupId, t.studyDate)],
 );
 
+/** Idempotency for attendance: one row per (member, study date), with the outcome. */
+export const submissions = pgTable(
+  'submissions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    memberId: uuid('member_id')
+      .notNull()
+      .references(() => members.id, { onDelete: 'cascade' }),
+    studyDate: date('study_date').notNull(),
+    kind: formKind('kind').notNull(),
+    status: submissionStatus('status').notNull(),
+    submittedAt: timestamp('submitted_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex('submissions_member_date_idx').on(t.memberId, t.studyDate)],
+);
+
 // Inferred row types for use in api/worker queries.
 export type Group = typeof groups.$inferSelect;
 export type NewGroup = typeof groups.$inferInsert;
@@ -144,3 +161,5 @@ export type PushToken = typeof pushTokens.$inferSelect;
 export type NewPushToken = typeof pushTokens.$inferInsert;
 export type ReminderLogRow = typeof reminderLog.$inferSelect;
 export type NewReminderLogRow = typeof reminderLog.$inferInsert;
+export type Submission = typeof submissions.$inferSelect;
+export type NewSubmission = typeof submissions.$inferInsert;
