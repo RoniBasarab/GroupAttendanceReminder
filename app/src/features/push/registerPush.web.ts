@@ -14,7 +14,16 @@ export async function registerForPush(): Promise<PushRegistration | null> {
 
   const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseWebConfig);
   const messaging = getMessaging(app);
-  const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+  const swParams = new URLSearchParams({
+    apiKey: firebaseWebConfig.apiKey ?? '',
+    authDomain: firebaseWebConfig.authDomain ?? '',
+    projectId: firebaseWebConfig.projectId ?? '',
+    messagingSenderId: firebaseWebConfig.messagingSenderId ?? '',
+    appId: firebaseWebConfig.appId ?? '',
+  });
+  const registration = await navigator.serviceWorker.register(
+    `/firebase-messaging-sw.js?${swParams.toString()}`,
+  );
   const token = await getToken(messaging, { vapidKey, serviceWorkerRegistration: registration });
 
   return token ? { token, platform: 'web' } : null;
