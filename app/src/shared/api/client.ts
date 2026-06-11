@@ -1,7 +1,7 @@
 import { API_BASE_URL } from '@/shared/config';
 
 type RequestOptions = {
-  method?: 'GET' | 'POST';
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   body?: unknown;
   token?: string;
 };

@@ -1,4 +1,4 @@
-import { Redirect } from 'expo-router';
+import { Link, Redirect } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Pressable, Share, StyleSheet, Text, View } from 'react-native';
 
@@ -34,6 +34,12 @@ export default function Home() {
       >
         <Text style={styles.buttonText}>Share join code</Text>
       </Pressable>
+
+      <Link href="/schedule" asChild>
+        <Pressable style={styles.button}>
+          <Text style={styles.buttonText}>Schedule</Text>
+        </Pressable>
+      </Link>
 
       <Pressable style={styles.link} onPress={clearSession}>
         <Text style={styles.linkText}>Sign out</Text>
