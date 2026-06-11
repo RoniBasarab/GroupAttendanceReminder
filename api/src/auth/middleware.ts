@@ -24,3 +24,12 @@ export function requireMember(db: Database): RequestHandler {
     next();
   });
 }
+
+/** Requires the authenticated member to be the group admin. Mount after requireMember. */
+export const ensureAdmin: RequestHandler = (req, _res, next) => {
+  if (req.member?.role !== 'admin') {
+    next(new AppError(403, 'Admin only.'));
+    return;
+  }
+  next();
+};
