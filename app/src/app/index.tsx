@@ -15,6 +15,7 @@ export default function Home() {
   }
 
   const { group, member } = session;
+  const isAdmin = member.role === 'admin';
 
   return (
     <View style={styles.container}>
@@ -42,6 +43,14 @@ export default function Home() {
           <Text style={styles.buttonText}>Schedule</Text>
         </Pressable>
       </Link>
+
+      {isAdmin ? (
+        <Link href="/members" asChild>
+          <Pressable style={styles.button}>
+            <Text style={styles.buttonText}>Manage members</Text>
+          </Pressable>
+        </Link>
+      ) : null}
 
       <Pressable
         style={styles.button}
