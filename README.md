@@ -1,6 +1,6 @@
 # Group Attendance Reminder
 
-Reminds a study group at **21:00** on class days and submits their attendance with one tap.
+Reminds a study group at **19:00** on class days and submits their attendance with one tap.
 Android ships as a native app; iPhone uses the web/PWA build of the same codebase.
 
 ## Monorepo layout (npm workspaces)
@@ -9,7 +9,7 @@ Android ships as a native app; iPhone uses the web/PWA build of the same codebas
 | --- | --- |
 | `app/` | Expo app (Android + web/PWA) — Expo Router, Zustand, TanStack Query, MMKV |
 | `api/` | Express REST API, deployed as a Vercel Function |
-| `worker/` | Home-PC `node-cron` scheduler (outbound-only) that triggers the 21:00 dispatch |
+| `worker/` | Home-PC `node-cron` scheduler (outbound-only) that triggers the 19:00 dispatch |
 | `core/` | Shared TypeScript: domain types, DB client (`@gar/core/db`), form configs |
 
 ## Prerequisites

@@ -114,7 +114,7 @@ export const pushTokens = pgTable(
   (t) => [index('push_tokens_member_idx').on(t.memberId)],
 );
 
-/** Dedupe for the 21:00 dispatch: one row per (group, study date) so the Vercel backup never double-sends. */
+/** Dedupe for the 19:00 dispatch: one row per (group, study date) so the Vercel backup never double-sends. */
 export const reminderLog = pgTable(
   'reminder_log',
   {
