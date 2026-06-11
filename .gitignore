@@ -50,3 +50,8 @@ CLAUDE.md
 
 # real Google Form configs (URLs + field IDs) — never publish; use forms.example.json
 core/forms.local.json
+
+# Firebase credentials — never commit
+google-services.json
+firebase-service-account.json
+*-firebase-adminsdk-*.json
