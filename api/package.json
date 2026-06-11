@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
-    "test": "tsx src/services/membership.test.ts && tsx src/services/schedule.test.ts",
+    "test": "tsx src/services/membership.test.ts && tsx src/services/schedule.test.ts && tsx src/services/push.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
